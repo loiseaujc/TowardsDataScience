@@ -1,1 +1,4 @@
-# TowardsDataScience
+# Towards Data Science
+
+This repo contains all of my contributions to [TowardsDataScience](https://towardsdatascience.com/) as well as supplementary material (e.g. Jupyter Notebooks, Python scripts, etc).
+- [A quick introduction to deep learning for beginners](???) : As the title states, this series is an introduction to deep learning for beginners. It is adapted from a doctoral course I'll teach at [Ecole Nationale Supérieure d'Arts et Métiers](???) next year. Assuming that students already have basic knowledge of Python (e.g. NumPy and SciPy essentially), this series aims at helping them gradually build their intuition about the inner mechanics of deep neural networks. For that purpose, we'll start from the first modern neural network, namely Frank Rosenblatt's perceptron, before moving on to the most widespread neural network architectures (i.e. fully connected nets, convolutional nets and LSTM).
