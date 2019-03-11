@@ -19,25 +19,24 @@ class Adaline(BaseEstimator, ClassifierMixin):
     ClassifierMixin.
     """
 
-    def __init__(self, add_intercept=True, solver="L-BFGS-B", tol=1e-8):
-        """Short summary.
+    def __init__(self, solver="CG", tol=1e-8):
+        """Initialize adaline object.
 
         Parameters
         ----------
-        add_intercept : type
-            Description of parameter `add_intercept` (the default is True).
-        solver : type
-            Description of parameter `solver` (the default is "L-BFGS-B").
-        tol : type
-            Description of parameter `tol` (the default is 1e-8).
+        solver : string
+            Solver to be used. See `scipy.optimize.minimize` for more details.
+            (the default is "CG").
+        tol : float
+            Tolerance for the minimization solver (the default is 1e-8).
 
         Returns
         -------
-        type
+        self
             Description of returned object.
 
         """
-        self.add_intercept = add_intercept
+
         self.solver = solver
         self.tol = tol
 
@@ -100,8 +99,8 @@ class Adaline(BaseEstimator, ClassifierMixin):
         """
         return H(self.decision_function(X))
 
-    def fit(self, X, y, maxiter=100):
-        """Fit the Rosenblatt perceptron using the given training data.
+    def fit(self, X, y):
+        """Fit the Adaline using the given training data.
 
         Parameters
         ----------
@@ -111,9 +110,6 @@ class Adaline(BaseEstimator, ClassifierMixin):
 
         y : array-like, shape = (n_samples, ).
             Labels associated to each training example in X.
-
-        maxiter : integer
-            Maximum number of iterations before it stops.
 
         Returns
         -------
@@ -125,9 +121,8 @@ class Adaline(BaseEstimator, ClassifierMixin):
         # --> Sanity check for X and y.
         X, y = check_X_y(X, y)
 
-        # --> Add intercept column if needed.
-        if self.add_intercept is True:
-            X = np.insert(X, 0, 1, axis=1)
+        # --> Add intercept column.
+        X = np.insert(X, 0, 1, axis=1)
 
         # --> Number of features.
         n_features = X.shape[1]
@@ -152,6 +147,25 @@ class Adaline(BaseEstimator, ClassifierMixin):
         return self
 
     def loss_function(self, w, X, y):
+        """Loss function for Adaline : Mean Squared Error (MSE).
+
+        Parameters
+        ----------
+        w : array, shape = (n_features, )
+            Current estimate of the bias (w[0]) and weights (w[1:]).
+        X : array-like, shape = (n_samples, n_features)
+            Traning samples.
+        y : array, shape = (n_samples, )
+            Labels associated to each training example in X.
+
+        Returns
+        -------
+        loss : float
+               Current value of the loss function.
+        grad : array, shape = (n_features, )
+               Current gradient.
+
+        """
 
         # --> Set the weights and bias of the adaline.
         self.bias = w[0]
@@ -202,7 +216,7 @@ if __name__ == "__main__":
         X, y,
         test_size=0.5,
         random_state=0,
-        )
+    )
 
     # --> Plot the problem.
     fig, ax = plt.subplots(
@@ -246,7 +260,7 @@ if __name__ == "__main__":
     ax[0].plot(
         x, d(x),
         color="k",
-        label = r"Adaline"
+        label=r"Adaline"
     )
 
     ax[1].plot(
@@ -275,14 +289,14 @@ if __name__ == "__main__":
     ax[0].plot(
         x, h(x),
         color="gray",
-        ls = "--",
-        label = r"Perceptron"
+        ls="--",
+        label=r"Perceptron"
     )
 
     ax[1].plot(
         x, h(x),
         color="gray",
-        ls = "--",
+        ls="--",
     )
 
     # --> Add decorators to the figure.

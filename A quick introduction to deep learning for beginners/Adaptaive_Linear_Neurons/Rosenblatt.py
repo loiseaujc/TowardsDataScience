@@ -1,6 +1,9 @@
 # --> Import standard Python libraries.
 import numpy as np
 
+# -->
+import warnings
+
 # --> Import sklearn utility functions.
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.exceptions import NotFittedError
@@ -137,6 +140,13 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
             # --> If no error is made, exit the outer  loop.
             if errors == 0:
                 break
+
+        # -->
+        if errors != 0:
+            warnings.warn(
+                "Perceptron learning did not converge using the maximum number"\
+                 "of iterations given."
+            )
 
         return self
 
