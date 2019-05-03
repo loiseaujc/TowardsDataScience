@@ -13,7 +13,7 @@ introductory course to deep learning for beginners.
 
 # Author : Jean-Christophe Loiseau <loiseau.jc@gmail.com>
 # Date : May 2019
-# Licence : ...
+# Licence : GPL-3.0
 
 # --> Import standard Python libraries.
 import numpy as np
