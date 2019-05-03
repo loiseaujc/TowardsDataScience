@@ -1,8 +1,28 @@
+"""
+Rosenblatt's Perceptron
+-----------------------
+
+This module implements Rosenblatt's Perceptron for linear classification
+problems. It is part of the supplementary material associated to a
+TowardsDataScience blog post on the subject [1] as well as of an
+introductory course to deep learning for beginners.
+
+[1] Link to the TDS post : https://tinyurl.com/y2ccfyrc
+
+"""
+
+# Author : Jean-Christophe Loiseau <loiseau.jc@gmail.com>
+# Data : March 2019
+# Licence : ...
+
+# --> Miscellaneous
+import warnings
+
 # --> Import standard Python libraries.
 import numpy as np
 
-# -->
-import warnings
+# --> Setup matplotlib
+import matplotlib.pyplot as plt
 
 # --> Import sklearn utility functions.
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -20,7 +40,14 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
     """
 
     def __init__(self):
-        return
+        # --> Weights of the model.
+        self.weights = None
+
+        # --> Bias.
+        self.bias = None
+
+        # --> Number of errors made at each stage of the training procedure.
+        self.errors_ = list()
 
     def decision_function(self, X):
         """Predict the signed distance from the decision hyperplane for each
@@ -111,9 +138,6 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
         self.weights = np.zeros((n_features, ))
         self.bias = 0.0
 
-        # --> List to store the number of errors.
-        self.errors_ = list()
-
         # --> Perceptron algorithm loop.
         for _ in range(maxiter):
 
@@ -141,7 +165,7 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
             if errors == 0:
                 break
 
-        # -->
+        # --> Raise warning if perceptron has not converged.
         if errors != 0:
             warnings.warn(
                 "Perceptron learning did not converge using the maximum number"
@@ -151,7 +175,7 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
         return self
 
 
-if __name__ == "__main__":
+def main(cmap="coolwarm"):
 
     # --> Generate toy problem.
     from sklearn.datasets import make_classification
@@ -168,13 +192,12 @@ if __name__ == "__main__":
     )
 
     # --> Plot the problem.
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(1, 1, figsize=(3, 3))
+    _, ax = plt.subplots(1, 1, figsize=(3, 3))
 
     ax.scatter(
         X[:, 0], X[:, 1],
         c=y,
-        cmap=plt.cm.coolwarm,
+        cmap=plt.get_cmap(cmap),
         s=40,
         edgecolors="k",
         alpha=0.5,
@@ -188,17 +211,18 @@ if __name__ == "__main__":
     model.fit(X, y)
 
     # --> Decision boundary.
-    def d(x): return -(model.weights[0] * x + model.bias)/model.weights[1]
+    def decision(x): return -(model.weights[0] * x + model.bias)/model.weights[1]
 
-    x0, x1 = ax.get_xlim()
-    x = np.linspace(x0, x1)
+    x = np.linspace(*ax.get_xlim())
 
     # --> Plot the decision boundary.
-    ax.plot(
-        x, d(x),
-        color="k"
-    )
+    ax.plot(x, decision(x), color="k")
 
-    ax.set_xlim(x0, x1)
+    ax.set_xlim(x.min(), x.max())
 
     plt.show()
+
+
+if __name__ == "__main__":
+
+    main()
