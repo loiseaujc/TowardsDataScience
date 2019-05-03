@@ -1,5 +1,25 @@
+"""
+Adaptive Linear Neurons
+-----------------------
+
+This module implements the Adaptive Linear Neuron for linear classification
+problems. It is part of the supplementary material associated to a
+TowardsDataScience blog post on the subject [1] as well as of an
+introductory course to deep learning for beginners.
+
+[1] Link to the TDS post :
+
+"""
+
+# Author : Jean-Christophe Loiseau <loiseau.jc@gmail.com>
+# Date : May 2019
+# Licence : ...
+
 # --> Import standard Python libraries.
 import numpy as np
+
+# --> Setup Matplotlib
+import matplotlib.pyplot as plt
 
 # --> Import SciPy optimization functions.
 from scipy.optimize import minimize
@@ -8,6 +28,13 @@ from scipy.optimize import minimize
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_X_y, check_array
+
+# --> Import sklearn utility functions.
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+# --> Import Rosenblatt's perceptron class
+from rosenblatt import Rosenblatt
 
 
 def H(z): return np.heaviside(z-0.5, 1).astype(np.int)
@@ -37,10 +64,17 @@ class Adaline(BaseEstimator, ClassifierMixin):
 
         """
 
+        # --> scipy.optimize solver to be used to train the model.
         self.solver = solver
+
+        # --> Tolerance for the minimization solver.
         self.tol = tol
 
-        return
+        # --> Weights of the model.
+        self.weights = None
+
+        # --> Bias.
+        self.bias = None
 
     def decision_function(self, X):
         """Predict the signed distance from the decision hyperplane for each
@@ -184,14 +218,7 @@ class Adaline(BaseEstimator, ClassifierMixin):
         return loss, grad
 
 
-if __name__ == "__main__":
-
-    # --> Import Matplotlib for plotting.
-    import matplotlib.pyplot as plt
-
-    # --> Import sklearn utility functions.
-    from sklearn.datasets import make_classification
-    from sklearn.model_selection import train_test_split
+def main(cmap="coolwarm"):
 
     #####################################
     #####                           #####
@@ -219,16 +246,12 @@ if __name__ == "__main__":
     )
 
     # --> Plot the problem.
-    fig, ax = plt.subplots(
-        1, 2,
-        figsize=(6, 3),
-        sharex=True, sharey=True
-    )
+    _, ax = plt.subplots(1, 2, figsize=(6, 3), sharex=True, sharey=True)
 
     ax[0].scatter(
         x_train[:, 0], x_train[:, 1],
         c=y_train,
-        cmap=plt.cm.coolwarm,
+        cmap=cmap,
         s=40,
         edgecolors="k",
         alpha=0.5,
@@ -237,7 +260,7 @@ if __name__ == "__main__":
     ax[1].scatter(
         x_test[:, 0], x_test[:, 1],
         c=y_test,
-        cmap=plt.cm.coolwarm,
+        cmap=cmap,
         s=40,
         edgecolors="k",
         alpha=0.5,
@@ -250,23 +273,15 @@ if __name__ == "__main__":
     adaline.fit(X, y)
 
     # --> Decision boundary.
-    def d(x):
+    def adaline_decision(x):
         return (0.5 - adaline.weights[0] * x - adaline.bias)/adaline.weights[1]
 
-    x0, x1 = ax[0].get_xlim()
-    x = np.linspace(x0, x1)
+    x = np.linspace(*ax[0].get_xlim())
 
     # --> Plot the decision boundary.
-    ax[0].plot(
-        x, d(x),
-        color="k",
-        label=r"Adaline"
-    )
+    ax[0].plot(x, adaline_decision(x), color="k", label=r"Adaline")
 
-    ax[1].plot(
-        x, d(x),
-        color="k"
-    )
+    ax[1].plot(x, adaline_decision(x), color="k")
 
     ########################################
     #####                              #####
@@ -274,33 +289,21 @@ if __name__ == "__main__":
     #####                              #####
     ########################################
 
-    # --> Import Rosenblatt's perceptron class
-    from Rosenblatt import Rosenblatt
-
     # --> Fit the perceptron model.
     perceptron = Rosenblatt()
     perceptron.fit(x_train, y_train)
 
     # --> Decision boundary for the perceptron.
-    def h(x):
+    def perceptron_decision(x):
         return (-perceptron.weights[0] * x - perceptron.bias)/perceptron.weights[1]
 
     # --> Plot the decision boundary.
-    ax[0].plot(
-        x, h(x),
-        color="gray",
-        ls="--",
-        label=r"Perceptron"
-    )
+    ax[0].plot(x, perceptron_decision(x), color="gray", ls="--", label=r"Perceptron")
 
-    ax[1].plot(
-        x, h(x),
-        color="gray",
-        ls="--",
-    )
+    ax[1].plot(x, perceptron_decision(x), color="gray", ls="--")
 
     # --> Add decorators to the figure.
-    ax[0].set_xlim(x0, x1)
+    ax[0].set_xlim(x.min(), x.max())
 
     ax[0].legend(loc="lower center", bbox_to_anchor=(1, 1), ncol=2)
 
@@ -311,3 +314,8 @@ if __name__ == "__main__":
     ax[1].set_title(r"(b) Testing dataset", y=-0.33)
 
     plt.show()
+
+
+if __name__ == "__main__":
+
+    main()

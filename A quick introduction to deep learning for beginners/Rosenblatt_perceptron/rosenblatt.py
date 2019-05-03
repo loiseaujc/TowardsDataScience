@@ -12,7 +12,7 @@ introductory course to deep learning for beginners.
 """
 
 # Author : Jean-Christophe Loiseau <loiseau.jc@gmail.com>
-# Data : March 2019
+# Date : March 2019
 # Licence : ...
 
 # --> Miscellaneous
@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_X_y, check_array
+from sklearn.datasets import make_classification
 
 
 def H(x): return np.heaviside(x, 1).astype(np.int)
@@ -178,8 +179,6 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
 def main(cmap="coolwarm"):
 
     # --> Generate toy problem.
-    from sklearn.datasets import make_classification
-
     X, y = make_classification(
         n_samples=100,
         n_features=2,
