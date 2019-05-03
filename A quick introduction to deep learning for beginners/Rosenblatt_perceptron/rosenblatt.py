@@ -197,7 +197,7 @@ def main(cmap="coolwarm"):
     ax.scatter(
         X[:, 0], X[:, 1],
         c=y,
-        cmap=plt.get_cmap(cmap),
+        cmap=cmap,
         s=40,
         edgecolors="k",
         alpha=0.5,
