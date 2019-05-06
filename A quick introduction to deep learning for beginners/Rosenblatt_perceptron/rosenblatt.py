@@ -139,11 +139,11 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
         self.weights = np.zeros((n_features, ))
         self.bias = 0.0
 
+        # --> Current number of errors.
+        errors = list()
+
         # --> Perceptron algorithm loop.
         for _ in range(maxiter):
-
-            # --> Current number of errors.
-            errors = 0
 
             # --> Loop through the examples.
             for xi, y_true in zip(X, y):
@@ -156,22 +156,22 @@ class Rosenblatt(BaseEstimator, ClassifierMixin):
                     self.weights += error * xi
                     self.bias += error
 
-                    # --> Current number of errors.
-                    errors += 1
-
-            # --> Total number of the i-th epoch.
-            self.errors_.append(errors)
+            # --> Current number of errors at the end of the epoch.
+            errors.append( abs(y - self.predict(X)).sum() )
 
             # --> If no error is made, exit the outer  loop.
-            if errors == 0:
+            if errors[-1] == 0:
                 break
 
         # --> Raise warning if perceptron has not converged.
-        if errors != 0:
+        if errors[-1] != 0:
             warnings.warn(
                 "Perceptron learning did not converge using the maximum number"
                 "of iterations given."
             )
+
+        # --> Number of errors at the end of the i-th epoch.
+        self.errors_ = np.asarray(errors)
 
         return self
 

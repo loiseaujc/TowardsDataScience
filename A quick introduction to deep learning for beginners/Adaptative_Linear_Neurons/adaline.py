@@ -220,12 +220,6 @@ class Adaline(BaseEstimator, ClassifierMixin):
 
 def main(cmap="coolwarm"):
 
-    #####################################
-    #####                           #####
-    #####     FIT ADALINE model     #####
-    #####                           #####
-    #####################################
-
     # --> Generate toy problem.
     X, y = make_classification(
         n_samples=100,
@@ -238,35 +232,23 @@ def main(cmap="coolwarm"):
         random_state=999,         # Fix random seed for reproducibility.
     )
 
-    # --> Split between training and testing.
-    x_train, x_test, y_train, y_test = train_test_split(
-        X, y,
-        test_size=0.5,
-        random_state=0,
-    )
+    # --> Flip one single example.
+    y[-1] = 0
 
     # --> Plot the problem.
-    _, ax = plt.subplots(1, 2, figsize=(6, 3), sharex=True, sharey=True)
+    _, ax = plt.subplots(1, 1, figsize=(3, 3))
 
-    ax[0].scatter(
-        x_train[:, 0], x_train[:, 1],
-        c=y_train,
+    ax.scatter(
+        X[:, 0], X[:, 1],
+        c=y,
         cmap=cmap,
         s=40,
         edgecolors="k",
         alpha=0.5,
     )
 
-    ax[1].scatter(
-        x_test[:, 0], x_test[:, 1],
-        c=y_test,
-        cmap=cmap,
-        s=40,
-        edgecolors="k",
-        alpha=0.5,
-    )
-
-    ax[1].set_xlabel(r"$x_1$")
+    ax.set_xlabel(r"$x_1$")
+    ax.set_ylabel(r"$x_2$")
 
     # --> Classify data using Adaline.
     adaline = Adaline()
@@ -276,42 +258,39 @@ def main(cmap="coolwarm"):
     def adaline_decision(x):
         return (0.5 - adaline.weights[0] * x - adaline.bias)/adaline.weights[1]
 
-    x = np.linspace(*ax[0].get_xlim())
+    x = np.linspace(*ax.get_xlim())
 
     # --> Plot the decision boundary.
-    ax[0].plot(x, adaline_decision(x), color="k", label=r"Adaline")
+    ax.plot(x, adaline_decision(x), color="k", label=r"Adaline")
 
-    ax[1].plot(x, adaline_decision(x), color="k")
-
-    ########################################
-    #####                              #####
-    #####     FIT PERCEPTRON MODEL     #####
-    #####                              #####
-    ########################################
+    ax.set_xlim(x.min(), x.max())
 
     # --> Fit the perceptron model.
     perceptron = Rosenblatt()
-    perceptron.fit(x_train, y_train)
+    perceptron.fit(X, y)
 
     # --> Decision boundary for the perceptron.
     def perceptron_decision(x):
         return (-perceptron.weights[0] * x - perceptron.bias)/perceptron.weights[1]
 
     # --> Plot the decision boundary.
-    ax[0].plot(x, perceptron_decision(x), color="gray", ls="--", label=r"Perceptron")
-
-    ax[1].plot(x, perceptron_decision(x), color="gray", ls="--")
+    ax.plot(x, perceptron_decision(x), color="gray", ls="--", label=r"Perceptron")
 
     # --> Add decorators to the figure.
-    ax[0].set_xlim(x.min(), x.max())
+    ax.set_xlim(x.min(), x.max())
 
-    ax[0].legend(loc="lower center", bbox_to_anchor=(1, 1), ncol=2)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), ncol=2)
 
-    ax[0].set_xlabel(r"$x_1$")
-    ax[0].set_ylabel(r"$x_2$")
+    ax.set_xlabel(r"$x_1$")
+    ax.set_ylabel(r"$x_2$")
 
-    ax[0].set_title(r"(a) Training dataset", y=-0.33)
-    ax[1].set_title(r"(b) Testing dataset", y=-0.33)
+    # --> Save figure.
+    plt.savefig(
+        "imgs/adaline_vs_perceptron.png",
+        bbox_inches="tight",
+        dpi=1200,
+        transparent=True,
+    )
 
     plt.show()
 
